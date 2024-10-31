@@ -1,0 +1,29 @@
+import speech_recognition as sr
+import hashlib
+
+def capture_voice():
+    recognizer = sr.Recognizer()
+    with sr.Microphone() as source:
+        print("Silakan berbicara...")
+        audio = recognizer.listen(source)
+    try:
+        text = recognizer.recognize_google(audio)
+        print("Anda mengatakan: " + text)
+        return text
+    except sr.UnknownValueError:
+        print("Tidak dapat mengenali suara.")
+        return None
+
+def encrypt_voice(text):
+    return hashlib.sha256(text.encode()).hexdigest()
+
+def verify_voice(input_text, stored_hash):
+    return encrypt_voice(input_text) == stored_hash
+
+stored_voice_hash = encrypt_voice("buka kunci")  
+
+voice_text = capture_voice()
+if voice_text and verify_voice(voice_text, stored_voice_hash):
+    print("Akses diterima, kunci terbuka.")
+else:
+    print("Akses ditolak, suara tidak cocok.")
